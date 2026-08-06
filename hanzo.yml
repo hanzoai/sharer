@@ -1,0 +1,17 @@
+# Screen-share client — Rust, WebRTC + ffmpeg + a native GUI.
+#
+# Gate: it compiles. The build needs system libraries the runner image does not
+# carry (ALSA for cpal, the ffmpeg dev headers for ac-ffmpeg, libxdo for enigo,
+# OpenSSL for native-tls), so the gate installs them first. That apt line is part
+# of the assertion, not setup around it: this crate cannot be built without them,
+# and a gate that skipped them would be reporting on the runner image rather than
+# on the code.
+test:
+  - name: build
+    run: |
+      set -euo pipefail
+      sudo apt-get update -qq
+      sudo apt-get install -y -qq pkg-config libssl-dev libasound2-dev libxdo-dev \
+        libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev \
+        libavdevice-dev libswscale-dev libswresample-dev
+      cargo build --locked
